@@ -55,7 +55,7 @@
            const adminDoc = await getDoc(doc(db, "admins", user.uid));
 
             if (adminDoc.exists()) {
-                alert("ログイン成功！管理者画面へ移動します。");
+                window.location.href = "admin.html";
                 // window.location.href = "admin_dashboard.html"; // 移動先URL
             } else {
                 await auth.signOut();
