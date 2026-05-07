@@ -70,7 +70,7 @@
     // ログイン状態の監視
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            console.log("ログイン中:", user.email);
+            console.log("ログイン中:", user.uid);
         }
     });
 </script>
