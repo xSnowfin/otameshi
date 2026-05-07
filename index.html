@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>管理者ログイン</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f0f2f5; }
+        .login-card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
+        button { background: #4285F4; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #357ae8; }
+        #status { margin-top: 1rem; color: #d93025; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h2>管理者パネル</h2>
+    <button id="loginBtn">Googleでログイン</button>
+    <div id="status"></div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // 1. あなたのFirebase Configに書き換えてください
+    const firebaseConfig = {
+      apiKey: "AIzaSyDzC5PS3fOpaRmOPNPe39_tTWV8LTaJfxM",
+      authDomain: "otameshi-75ca5.firebaseapp.com",
+      projectId: "otameshi-75ca5",
+      storageBucket: "otameshi-75ca5.firebasestorage.app",
+      messagingSenderId: "168685999074",
+      appId: "1:168685999074:web:268f11495911ea177ddfbb",
+      measurementId: "G-T5ZHB8TNCM"
+    };
+
+    // Firebase初期化
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore();
+    const provider = new GoogleAuthProvider();
+
+    const loginBtn = document.getElementById('loginBtn');
+    const statusDiv = document.getElementById('status');
+
+    // 2. ログインボタンの処理
+    loginBtn.addEventListener('click', async () => {
+        try {
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+            
+            // 3. Firestoreの「管理者リスト」に存在するかチェック
+            // ※ルールで$("管理者リスト")としたので、ここも合わせます
+            const adminDoc = await getDoc(doc(db, "管理者リスト", user.email));
+
+            if (adminDoc.exists()) {
+                alert("ログイン成功！管理者画面へ移動します。");
+                // window.location.href = "admin_dashboard.html"; // 移動先URL
+            } else {
+                await auth.signOut();
+                statusDiv.innerText = "エラー：このアカウントには管理者権限がありません。";
+            }
+        } catch (error) {
+            console.error(error);
+            statusDiv.innerText = "ログイン中にエラーが発生しました。";
+        }
+    });
+
+    // ログイン状態の監視
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            console.log("ログイン中:", user.email);
+        }
+    });
+</script>
+</body>
+</html>
