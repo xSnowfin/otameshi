@@ -52,7 +52,7 @@
             
             // 3. Firestoreの「管理者リスト」に存在するかチェック
             // ※ルールで$("管理者リスト")としたので、ここも合わせます
-            const adminDoc = await getDoc(doc(db, "管理者リスト", user.email));
+           const adminDoc = await getDoc(doc(db, "管理者リスト", user.uid));
 
             if (adminDoc.exists()) {
                 alert("ログイン成功！管理者画面へ移動します。");
