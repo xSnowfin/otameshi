@@ -1,47 +1,108 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>管理者ページ</title>
 </head>
 <body>
-  <h1>管理者ページ</h1>
-  <p id="status">確認中...</p>
+
+<h1>管理者ページ</h1>
+<p id="status">確認中...</p>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+import {
+  initializeAppCheck,
+  ReCaptchaV3Provider
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app-check.js";
+
+
+// Firebase設定
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
+  apiKey: "AIzaSyDzC5PS3fOpaRmOPNPe39_tTWV8LTaJfxM",
+  authDomain: "otameshi-75ca5.firebaseapp.com",
+  projectId: "otameshi-75ca5",
+  storageBucket: "otameshi-75ca5.firebasestorage.app",
+  messagingSenderId: "168685999074",
+  appId: "1:168685999074:web:268f11495911ea177ddfbb",
+  measurementId: "G-T5ZHB8TNCM"
 };
 
+
+// Firebase初期化
 const app = initializeApp(firebaseConfig);
+
+
+// App Check初期化
+initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider("YOUR_RECAPTCHA_SITE_KEY"),
+  isTokenAutoRefreshEnabled: true
+});
+
+
+// Auth / Firestore
 const auth = getAuth();
 const db = getFirestore();
 
 const status = document.getElementById("status");
 
+
+// ログイン状態監視
 onAuthStateChanged(auth, async (user) => {
 
+  // 未ログイン
   if (!user) {
     window.location.href = "index.html";
     return;
   }
 
-  const adminDoc = await getDoc(doc(db, "admins", user.uid));
+  try {
 
-  if (!adminDoc.exists()) {
-    await signOut(auth);
-    window.location.href = "index.html";
-    return;
+    // adminsコレクション確認
+    const adminDoc = await getDoc(
+      doc(db, "admins", user.uid)
+    );
+
+    // 管理者じゃない
+    if (!adminDoc.exists()) {
+
+      await signOut(auth);
+
+      window.location.href = "index.html";
+      return;
+    }
+
+    // 管理者OK
+    status.innerText = "管理者としてログイン中";
+
+    console.log("管理者UID:", user.uid);
+
+  } catch (error) {
+
+    console.error(error);
+
+    status.innerText = "エラーが発生しました";
+
   }
 
-  status.innerText = "管理者としてログイン中";
 });
+
 </script>
+
 </body>
 </html>
