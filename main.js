@@ -1,46 +1,77 @@
-// あなたのmicroCMSのサービスドメインとAPIキーに書き換えてください
-const SERVICE_DOMAIN = 'zaou0515'; // 例: my-local-site
+// 1. 設定情報
+const SERVICE_DOMAIN = 'zaou0515'; 
 const API_KEY = 'yEh5YWV11pGfkdBh3PgNT8uO90TiBqNmSUDU';
 
-// ニュースを取得してHTMLに埋め込む関数
+// --- ニュースを取得して表示する関数 ---
 async function fetchNews() {
   const url = `https://${SERVICE_DOMAIN}.microcms.io/api/v1/news`;
-  
   try {
-    // 1. microCMSからデータを取得する (Fetch API)
-    const response = await fetch(url, {
-      headers: {
-        'X-MICROCMS-API-KEY': API_KEY
-      }
-    });
+    const response = await fetch(url, { headers: { 'X-MICROCMS-API-KEY': API_KEY } });
     const data = await response.json();
-
-    // 2. HTMLの「空の箱（ニュースリスト）」を取得する
     const newsListElement = document.getElementById('news-list');
-    
-    // 中身を一旦空にする（「読み込み中...」の文字を消す）
-    newsListElement.innerHTML = '';
+    if (!newsListElement) return;
 
-    // 3. 取得したデータをループして、HTMLタグを生成して追加する
+    newsListElement.innerHTML = '';
     data.contents.forEach(item => {
-      // <li>タグを作る
       const li = document.createElement('li');
-      
-      // 日付を整える（例: 2026-05-11T... -> 2026/05/11）
       const date = new Date(item.publishedAt).toLocaleDateString('ja-JP');
-      
-      // HTMLの中身をセットする
       li.innerHTML = `<span class="date">${date}</span> <a href="detail.html?id=${item.id}">${item.title}</a>`;
-      
-      // 作った<li>をニュースリストに追加する
       newsListElement.appendChild(li);
     });
+  } catch (error) { console.error('ニュース取得失敗:', error); }
+}
 
-  } catch (error) {
-    console.error('データの取得に失敗しました:', error);
-    document.getElementById('news-list').innerHTML = '<li>読み込みに失敗しました。</li>';
+// --- イベントを取得して表示する関数 ---
+async function fetchEvents() {
+  const url = `https://${SERVICE_DOMAIN}.microcms.io/api/v1/event`;
+  try {
+    const response = await fetch(url, { headers: { 'X-MICROCMS-API-KEY': API_KEY } });
+    const data = await response.json();
+    const eventListElement = document.getElementById('event-list');
+    if (!eventListElement) return;
+
+    eventListElement.innerHTML = '';
+    data.contents.forEach(item => {
+      const li = document.createElement('li');
+      li.innerHTML = `<a href="event-detail.html?id=${item.id}">${item.title}</a>`;
+      eventListElement.appendChild(li);
+    });
+  } catch (error) { console.error('イベント取得失敗:', error); }
+}
+
+// --- 季節のおすすめを取得して表示する関数 ---
+async function fetchSeasonal() {
+  // エンドポイントを seasonal に変更
+  const url = `https://${SERVICE_DOMAIN}.microcms.io/api/v1/seasonal`;
+  try {
+    const response = await fetch(url, { headers: { 'X-MICROCMS-API-KEY': API_KEY } });
+    const data = await response.json();
+    const seasonalContainer = document.getElementById('seasonal-content');
+    if (!seasonalContainer) return;
+
+    seasonalContainer.innerHTML = ''; // 読み込み中をクリア
+
+    // 最新の1件だけ表示する例
+    if (data.contents.length > 0) {
+      const item = data.contents[0];
+      // 画像(item.image.url)とタイトルを表示
+      seasonalContainer.innerHTML = `
+        <div class="seasonal-item">
+          <img src="${item.image.url}" alt="${item.title}" style="width: 100%; border-radius: 5px; margin-bottom: 10px;">
+          <p><strong>${item.title}</strong></p>
+          <a href="seasonal-detail.html?id=${item.id}" style="font-size: 0.9rem;">詳しく見る →</a>
+        </div>
+      `;
+    } else {
+      seasonalContainer.innerHTML = '<p>現在おすすめはありません</p>';
+    }
+  } catch (error) { 
+    console.error('季節のおすすめ取得失敗:', error);
+    document.getElementById('seasonal-content').innerHTML = 'データがありません';
   }
 }
 
-// ページが読み込まれたらニュース取得処理を実行する
+// --- ページ読み込み時にすべて実行 ---
 fetchNews();
+fetchEvents();
+fetchSeasonal();
