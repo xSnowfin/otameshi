@@ -1,0 +1,76 @@
+/* 基本のスタイルリセットと設定 */
+body {
+  font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+  line-height: 1.6;
+  background-color: #f4f7f6;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+.site-header, .site-footer {
+  background-color: #2c3e50;
+  color: #fff;
+  text-align: center;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+/* レイアウト（PCでは2カラム、スマホでは1カラム） */
+.content-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.main-column {
+  flex: 2;
+  min-width: 300px;
+}
+.side-column {
+  flex: 1;
+  min-width: 300px;
+}
+
+/* 各セクション（カード型デザイン） */
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+.card h2 {
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 10px;
+  margin-top: 0;
+  font-size: 1.2rem;
+}
+
+/* リストのスタイル */
+.news-list, .event-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.news-list li, .event-list li {
+  border-bottom: 1px dashed #ccc;
+  padding: 10px 0;
+}
+.news-list li:last-child {
+  border-bottom: none;
+}
+.date {
+  color: #888;
+  font-size: 0.85rem;
+  margin-right: 10px;
+}
+
+/* 装飾 */
+.highlight-card { border: 2px solid #e67e22; }
+.quiz-card { background-color: #fcf3cf; }
