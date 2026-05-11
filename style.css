@@ -81,3 +81,43 @@ body {
   object-fit: cover; /* 画像を枠に合わせていい感じに切り抜く */
   display: block;
 }
+
+.quiz-btn {
+  background-color: #fff;
+  border: 2px solid #ddd;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.quiz-btn:hover:not(:disabled) {
+  background-color: #f0f0f0;
+  border-color: #bbb;
+}
+
+.quiz-btn:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between; /* 左右に広げる */
+  align-items: center; /* 上下中央 */
+  padding: 20px 40px; /* 左右の余白を少し多めに */
+}
+
+.weather-box {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+.weather-temp {
+  font-size: 1.2rem;
+  font-weight: bold;
+}

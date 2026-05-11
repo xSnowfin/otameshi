@@ -64,11 +64,11 @@
         // 4. HTML要素にデータを流し込む
         // ※microCMSのフィールドIDが title, content, event_date である前提です
         document.getElementById('post-title').textContent = data.title;
-        document.getElementById('post-body').innerHTML = data.content;
+        document.getElementById('post-body').innerHTML = data.rich;
         
         // 開催日がある場合（日付形式のフィールドを作った場合）
-        if (data.event_date) {
-          const date = new Date(data.event_date).toLocaleDateString('ja-JP', {
+        if (data.date) {
+          const date = new Date(data.date).toLocaleDateString('ja-JP', {
             year: 'numeric', month: 'long', day: 'numeric', weekday: 'short'
           });
           document.getElementById('event-date').textContent = date;

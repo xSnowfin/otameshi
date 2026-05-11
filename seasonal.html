@@ -2,95 +2,61 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>季節のおすすめ詳細</title>
+  <title>詳細ページ</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    /* おすすめスポット専用のスタイル */
-    .seasonal-header-img {
-      width: 100%;
-      max-height: 400px;
-      object-fit: cover;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-    .access-box {
-      background-color: #f0f7ff;
-      border-left: 5px solid #3498db;
-      padding: 20px;
-      margin: 20px 0;
-    }
-    .access-title {
-      font-weight: bold;
-      color: #2980b9;
-      display: block;
-      margin-bottom: 5px;
-    }
-  </style>
 </head>
 <body>
   <main class="container">
-    <a href="index.html" style="display: inline-block; margin-bottom: 20px;">← 一覧に戻る</a>
-    
-    <article class="card">
+    <a href="index.html">← 一覧に戻る</a>
+    <article>
       <h1 id="post-title">読み込み中...</h1>
-      
-      <img id="post-image" src="" alt="" class="seasonal-header-img" style="display:none;">
-
-      <div id="post-body"></div>
-
-      <div id="access-info" class="access-box" style="display:none;">
-        <span class="access-title">📍 アクセス・場所</span>
-        <div id="post-access"></div>
-      </div>
+      <hr>
+      <div id="post-body" style="margin-top: 20px;"></div>
     </article>
   </main>
 
   <script>
-    const SERVICE_DOMAIN = 'zaou0515'; 
-    const API_KEY = 'yEh5YWV11pGfkdBh3PgNT8uO90TiBqNmSUDU';
+  const SERVICE_DOMAIN = 'zaou0515'; 
+  const API_KEY = 'yEh5YWV11pGfkdBh3PgNT8uO90TiBqNmSUDU';
 
-    const params = new URLSearchParams(window.location.search);
-    const contentId = params.get('id');
+  const params = new URLSearchParams(window.location.search);
+  const contentId = params.get('id');
 
-    async function fetchSeasonalDetail() {
-      // エンドポイントを seasonal に指定
-      const url = `https://${SERVICE_DOMAIN}.microcms.io/api/v1/seasonal/${contentId}`;
+  async function fetchDetail() {
+    // 1. URLを組み立てる
+    const url = `https://${SERVICE_DOMAIN}.microcms.io/api/v1/seasonal/${contentId}`;
+    
+    try {
+      const response = await fetch(url, {
+        headers: { 'X-MICROCMS-API-KEY': API_KEY }
+      });
       
-      try {
-        const response = await fetch(url, {
-          headers: { 'X-MICROCMS-API-KEY': API_KEY }
-        });
-        const data = await response.json();
-
-        // 1. タイトルのセット
-        document.getElementById('post-title').textContent = data.title;
-
-        // 2. 画像のセット（画像がある場合）
-        if (data.image) {
-          const imgTag = document.getElementById('post-image');
-          imgTag.src = data.image.url;
-          imgTag.style.display = 'block';
-        }
-
-        // 3. 本文のセット（フィールドIDが content の前提）
-        document.getElementById('post-body').innerHTML = data.content;
-
-        // 4. アクセス情報のセット（もしフィールドIDが access で作成していたら）
-        if (data.access) {
-          document.getElementById('access-info').style.display = 'block';
-          document.getElementById('post-access').textContent = data.access;
-        }
-
-      } catch (error) {
-        console.error(error);
-        document.getElementById('post-title').textContent = '情報が見つかりませんでした';
+      if (!response.ok) {
+        throw new Error('データの取得に失敗しました');
       }
-    }
 
-    if (contentId) {
-      fetchSeasonalDetail();
+      const data = await response.json();
+
+      // 2. 画面に反映する（ここをmicroCMSのフィールドIDに厳密に合わせました）
+      // タイトル: title1
+      document.getElementById('post-title').textContent = data.title || 'タイトルなし';
+      
+      // 本文: text
+      // もし本文が表示されない場合は、管理画面で「text」というIDが正しいか再確認してください
+      document.getElementById('post-body').innerHTML = data.text || '本文がありません';
+
+    } catch (error) {
+      console.error('エラー内容:', error);
+      document.getElementById('post-title').textContent = '情報が見つかりませんでした';
     }
-  </script>
+  }
+
+  // IDがあるときだけ実行
+  if (contentId) {
+    fetchDetail();
+  } else {
+    document.getElementById('post-title').textContent = '記事のIDが見つかりません';
+  }
+</script>
 </body>
 </html>

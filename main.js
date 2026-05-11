@@ -41,7 +41,6 @@ async function fetchEvents() {
 
 // --- 季節のおすすめを取得して表示する関数 ---
 async function fetchSeasonal() {
-  // エンドポイントを seasonal に変更
   const url = `https://${SERVICE_DOMAIN}.microcms.io/api/v1/seasonal`;
   try {
     const response = await fetch(url, { headers: { 'X-MICROCMS-API-KEY': API_KEY } });
@@ -49,17 +48,14 @@ async function fetchSeasonal() {
     const seasonalContainer = document.getElementById('seasonal-content');
     if (!seasonalContainer) return;
 
-    seasonalContainer.innerHTML = ''; // 読み込み中をクリア
+    seasonalContainer.innerHTML = '';
 
-    // 最新の1件だけ表示する例
     if (data.contents.length > 0) {
       const item = data.contents[0];
-      // 画像(item.image.url)とタイトルを表示
+      // 画像タグを削除し、タイトルとリンクのみにする
       seasonalContainer.innerHTML = `
         <div class="seasonal-item">
-          <img src="${item.image.url}" alt="${item.title}" style="width: 100%; border-radius: 5px; margin-bottom: 10px;">
-          <p><strong>${item.title}</strong></p>
-          <a href="seasonal-detail.html?id=${item.id}" style="font-size: 0.9rem;">詳しく見る →</a>
+          <a href="seasonal.html?id=${item.id}">${item.title}</a>
         </div>
       `;
     } else {
@@ -71,7 +67,64 @@ async function fetchSeasonal() {
   }
 }
 
-// --- ページ読み込み時にすべて実行 ---
+async function fetchQuizList() {
+  const url = `https://${SERVICE_DOMAIN}.microcms.io/api/v1/quiz`;
+  try {
+    const response = await fetch(url, { headers: { 'X-MICROCMS-API-KEY': API_KEY } });
+    const data = await response.json();
+    const quizContainer = document.getElementById('quiz-content'); // HTMLのIDに合わせてください
+    if (!quizContainer) return;
+
+    quizContainer.innerHTML = '';
+    data.contents.forEach(item => {
+      const div = document.createElement('div');
+      div.style.marginBottom = "10px";
+      // quiz-detail.html へのリンクを作成
+      div.innerHTML = `
+        <a href="quiz-detail.html?id=${item.id}" class="quiz-link-item">
+          📝 ${item.title}
+        </a>
+      `;
+      quizContainer.appendChild(div);
+    });
+  } catch (error) { console.error('クイズ一覧取得失敗:', error); }
+}
+
+// --- 天気を取得して表示する関数 ---
+async function fetchWeather() {
+  // 例として東京（緯度:35.67, 経度:139.65）の天気を取得
+  // あなたの地域の緯度経度に変えることもできます
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=38.17159&longitude=140.4027017&current_weather=true&timezone=Asia%2FTokyo`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    const weather = data.current_weather;
+    const weatherBox = document.getElementById('weather');
+
+    // 天気コードをアイコン（絵文字）に変換
+    const weatherIcons = {
+      0: "☀️", 1: "🌤", 2: "⛅", 3: "☁️",
+      45: "🌫", 48: "🌫", 51: "🌦", 61: "🌧",
+      71: "❄️", 95: "⚡"
+    };
+    const icon = weatherIcons[weather.weathercode] || "☁️";
+
+    weatherBox.innerHTML = `
+      <div>蔵王の天気</div>
+      <div>
+        <span style="font-size: 1.5rem;">${icon}</span>
+        <span class="weather-temp">${weather.temperature}℃</span>
+      </div>
+    `;
+  } catch (error) {
+    document.getElementById('weather').innerHTML = "天気取得失敗";
+  }
+}
+
+// 実行
+fetchWeather();
+fetchQuizList();
 fetchNews();
 fetchEvents();
 fetchSeasonal();
