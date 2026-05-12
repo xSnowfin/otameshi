@@ -2,37 +2,62 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>クイズ回答</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    /* クイズ専用の追加スタイル */
     .choice-btn {
-      display: block; width: 100%; padding: 15px; margin: 10px 0;
-      background: #fff; border: 2px solid #ddd; border-radius: 8px;
-      text-align: left; cursor: pointer; font-size: 1rem; transition: 0.2s;
+      display: block; 
+      width: 100%; 
+      padding: 15px; 
+      margin: 10px 0;
+      background: #fff; 
+      border: 2px solid #ddd; 
+      border-radius: 8px;
+      text-align: left; 
+      cursor: pointer; 
+      font-size: 1rem; 
+      transition: 0.2s;
     }
-    .choice-btn:hover:not(:disabled) { background: #f0f8ff; border-color: #3498db; }
-    .choice-btn:disabled { cursor: default; opacity: 0.7; }
-    #result-area { display: none; margin-top: 20px; padding: 20px; border-radius: 8px; }
+    .choice-btn:hover:not(:disabled) { 
+      background: #f0f8ff; 
+      border-color: #3498db; 
+    }
+    .choice-btn:disabled { 
+      cursor: default; 
+      opacity: 0.7; 
+    }
+    #result-area { 
+      display: none; 
+      margin-top: 20px; 
+      padding: 20px; 
+      border-radius: 8px; 
+    }
+    /* 正解・不正解時の色分け */
     .correct { background: #ffebeb; border: 2px solid #e74c3c; }
     .wrong { background: #e1f5fe; border: 2px solid #3498db; }
   </style>
 </head>
 <body>
   <main class="container">
-    <a href="index.html">← クイズ一覧に戻る</a>
-    
-    <article class="card">
-      <h2 id="quiz-question">問題を読み込み中...</h2>
+    <div class="detail-container"> <a href="index.html" class="back-link">← クイズ一覧に戻る</a>
       
-      <div id="choices-container">
-        </div>
+      <article>
+        <h2 id="quiz-question" style="margin-bottom: 20px;">問題を読み込み中...</h2>
+        
+        <div id="choices-container">
+          </div>
 
-      <div id="result-area">
-        <h3 id="result-status"></h3>
-        <p id="result-explanation"></p>
-        <button onclick="location.href='index.html'" style="margin-top:10px; padding:10px;">次へ（一覧に戻る）</button>
-      </div>
-    </article>
+        <div id="result-area">
+          <h3 id="result-status"></h3>
+          <p id="result-explanation" style="margin: 10px 0; line-height: 1.6;"></p>
+          <button onclick="location.href='index.html'" style="margin-top:10px; padding:10px 20px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc; background: #fff;">
+            次へ（一覧に戻る）
+          </button>
+        </div>
+      </article>
+    </div>
   </main>
 
   <script>
@@ -51,11 +76,12 @@
         document.getElementById('quiz-question').textContent = data.question;
 
         const container = document.getElementById('choices-container');
-        // 3つの選択肢を配列にしてループでボタン作成
-        [data.choice1, data.choice2, data.choice3].forEach((choiceText, index) => {
+        // microCMSのフィールド名に合わせて配列を作成
+        [data.choice1, data.choice2, data.choice3,data.choice4].forEach((choiceText, index) => {
           const btn = document.createElement('button');
           btn.className = 'choice-btn';
           btn.textContent = `${index + 1}. ${choiceText}`;
+          // index + 1 が選択番号、data.correct_number が正解番号
           btn.onclick = () => checkAnswer(index + 1, data.correct_number, data.explanation);
           container.appendChild(btn);
         });
@@ -68,10 +94,11 @@
       const status = document.getElementById('result-status');
       const expl = document.getElementById('result-explanation');
       
-      // 全ボタンを無効化
+      // 全ボタンを無効化（連打防止）
       document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
 
       resultArea.style.display = 'block';
+      // 数値として比較するために == を使用
       if (selected == correct) {
         status.textContent = "⭕ 正解！";
         status.style.color = "#e74c3c";
@@ -81,7 +108,7 @@
         status.style.color = "#3498db";
         resultArea.className = "wrong";
       }
-      expl.textContent = explanation;
+      expl.textContent = explanation || "解説はありません。";
     }
 
     if (contentId) fetchQuizDetail();

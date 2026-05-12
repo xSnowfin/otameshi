@@ -67,6 +67,7 @@ async function fetchSeasonal() {
   }
 }
 
+// --- クイズのやつを取得して表示する関数 ---
 async function fetchQuizList() {
   const url = `https://${SERVICE_DOMAIN}.microcms.io/api/v1/quiz`;
   try {

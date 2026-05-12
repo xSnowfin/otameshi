@@ -121,3 +121,62 @@ body {
   font-size: 1.2rem;
   font-weight: bold;
 }
+
+/* 詳細ページの土台：幅を絞って中央に寄せる */
+.detail-container {
+  max-width: 800px;         /* 記事が横に広がりすぎないように制限 */
+  margin: 50px auto;        /* 上下に余白を作り、左右中央に配置 */
+  padding: 40px;            /* 内側にゆとりを作る */
+  background-color: #ffffff; /* 記事背景を白にする */
+  border-radius: 10px;      /* 角を少し丸くする */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05); /* ほんのり影をつける */
+}
+
+/* 戻るボタンの装飾 */
+.back-link {
+  display: inline-block;
+  text-decoration: none;
+  color: #3498db;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+.back-link:hover {
+  text-decoration: underline;
+}
+
+/* 記事タイトル */
+#post-title {
+  font-size: 2.2rem;
+  color: #333;
+  line-height: 1.3;
+  margin-bottom: 10px;
+}
+
+/* 投稿日付 */
+#post-date {
+  color: #888;
+  font-size: 0.9rem;
+}
+
+/* 本文エリア（microCMSのリッチエディタの中身）の装飾 */
+#post-body {
+  margin-top: 30px;
+  line-height: 1.8; /* 行間を広くして読みやすく */
+  color: #444;
+}
+
+/* 本文の中にある見出し（h2など）を自動で装飾 */
+#post-body h2 {
+  border-left: 6px solid #3498db;
+  padding: 10px 20px;
+  background: #f4f7f6;
+  margin: 40px 0 20px 0;
+}
+
+/* 本文の中にある画像が枠からはみ出ないようにする */
+#post-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+  margin: 20px 0;
+}
