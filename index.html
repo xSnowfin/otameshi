@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蔵王ジャンプ台・特殊事象調査インベントリ</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #1a1a2e;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 1.5rem;
+            color: #00fff0;
+            border-bottom: 2px solid #00fff0;
+            padding-bottom: 10px;
+        }
+        .status-box {
+            background: #16213e;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            border: 1px solid #0f3460;
+        }
+        /* キーワード（アイテム）を表示するエリア */
+        .inventory-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .item-slot {
+            width: 80px;
+            height: 80px;
+            background: #0f3460;
+            border: 2px dashed #00fff0;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        /* キーワードをゲットしたときのスタイル */
+        .item-slot.acquired {
+            background: #00fff0;
+            color: #1a1a2e;
+            border-style: solid;
+            box-shadow: 0 0 15px #00fff0;
+        }
+        /* 推理解答フォーム */
+        .answer-section {
+            margin-top: 40px;
+            padding: 20px;
+            background: #0f3460;
+            border-radius: 8px;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 4px;
+            border: none;
+            margin-bottom: 10px;
+        }
+        button {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🔍 蔵王調査用インベントリ</h1>
+    <p>現地でARオブジェクトを見つけ、タップしてキーワードを集めよ。</p>
+
+    <div class="status-box">
+        <p id="status-text">調査中...</p>
+    </div>
+
+    <h3>【収集したキーワード（手がかり）】</h3>
+    <div class="inventory-container">
+        <div id="slot-A" class="item-slot">？？？</div>
+        <div id="slot-B" class="item-slot">？？？</div>
+        <div id="slot-C" class="item-slot">？？？</div>
+    </div>
+
+    <div class="answer-section">
+        <h3>🚨 真犯人の名前を暴け</h3>
+        <p>すべてのキーワードが揃うと、推理が可能になる。</p>
+        <input type="text" id="final-answer" placeholder="犯人の名前を入力">
+        <br>
+        <button onclick="checkAnswer()">告発する</button>
+    </div>
+
+    <script>
+        // 1. ページが読み込まれたときにURLをチェックする
+        window.onload = function() {
+            // URLの「?get=xxx」の部分を解析する
+            const urlParams = new URLSearchParams(window.location.search);
+            const keyword = urlParams.get('get');
+
+            // すでに持っているキーワードをブラウザの記憶（localStorage）から復元
+            if(localStorage.getItem('keyword_A')) { activateSlot('A', localStorage.getItem('keyword_A')); }
+            if(localStorage.getItem('keyword_B')) { activateSlot('B', localStorage.getItem('keyword_B')); }
+            if(localStorage.getItem('keyword_C')) { activateSlot('C', localStorage.getItem('keyword_C')); }
+
+            // URLにキーワードが含まれていた場合の処理
+            if (keyword) {
+                if (keyword === 'JUMP_START') {
+                    localStorage.setItem('keyword_A', '【氷】');
+                    activateSlot('A', '【氷】');
+                    alert('キーワード「氷」を手に入れた！');
+                } else if (keyword === 'MONUMENT') {
+                    localStorage.setItem('keyword_B', '【怨】');
+                    activateSlot('B', '【怨】');
+                    alert('キーワード「怨」を手に入れた！');
+                } else if (keyword === 'KANBAN') {
+                    localStorage.setItem('keyword_C', '【狐】');
+                    activateSlot('C', '【狐】');
+                    alert('キーワード「狐」を手に入れた！');
+                }
+                
+                // URLをきれいに掃除（リロードしても何度もアラートが出ないようにする）
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            updateStatus();
+        };
+
+        // スロットを「獲得済」の見た目にする関数
+        function activateSlot(id, text) {
+            const slot = document.getElementById('slot-' + id);
+            slot.innerText = text;
+            slot.classList.add('acquired');
+        }
+
+        // 調査状況のテキストを更新する関数
+        function updateStatus() {
+            let count = 0;
+            if(localStorage.getItem('keyword_A')) count++;
+            if(localStorage.getItem('keyword_B')) count++;
+            if(localStorage.getItem('keyword_C')) count++;
+
+            const statusText = document.getElementById('status-text');
+            if(count === 3) {
+                statusText.innerHTML = "🎉 全ての手がかりが揃った！犯人を特定せよ。";
+                statusText.style.color = "#00fff0";
+            } else {
+                statusText.innerHTML = `現在の進捗: 手がかりを ${count} / 3 個発見`;
+            }
+        }
+
+        // 最後の答え合わせ
+        function checkAnswer() {
+            const answer = document.getElementById('final-answer').value;
+            // 正解が「スノー」だった場合の例
+            if (answer === 'スノー') {
+                alert('正解！事件解決です。蔵王の平和は守られた！');
+                localStorage.clear(); // データをリセット
+                location.reload();
+            } else {
+                alert('不正解だ。もう一度集めたキーワードから推理せよ。');
+            }
+        }
+    </script>
+</body>
+</html>
